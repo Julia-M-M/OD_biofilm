@@ -19,11 +19,12 @@ if (!defined $dir){
 
 my @file = glob("$dir/*");
 
-say "@file"
+foreach my $file (@file) {
+	say $file;
+}
+
 
 # Values
-
-
 my $id = 7376;
 my $OD_neg_control = -0.000514644;
 my $OD_neg_control_SD = 0.002276625;
