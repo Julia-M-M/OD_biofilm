@@ -1,81 +1,72 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
 
 
-#Open file
-my @file = glob("/Users/jmm/Desktop/Doctorado/OXFORD/4_Metadata/BIGSdb_040603_1365734700_35217.txt") or die "ERROR $!";
-say "locus\tallele_id\tsequence\tstatus";
+# Input file
+my ( $dir, $DEBUG, $filename );
 
-"""
-next(file) #Skip header
-data = file.readlines()
-file.close()
-
-print(data) #The data is: 'id\tOD_neg_control\tOD_neg_control_SD\tOD_sample\n'
-
-
-# Set variables
-column = 0
-id=[]
-for x in data:
-    id.append(x.split()[column])
-#print(id)
-
-column = 1
-OD_neg_control=[]
-for x in data:
-    OD_neg_control.append(x.split()[column])
-#print(OD_neg_control)
-
-column = 2
-OD_neg_control_SD=[]
-for x in data:
-    OD_neg_control_SD.append(x.split()[column])
-#print(OD_neg_control_SD)
-
-column = 3
-OD_sample=[]
-for x in data:
-    OD_sample.append(x.split()[column])
-#print(OD_sample)
+GetOptions(
+    'd|dir|directory=s'  => \$dir,
+    'db|debug'   => \$DEBUG
+);
+if (!defined $dir){
+	$dir = '.';
+	
+}
 
 
-"""
-id = 7376
-OD_neg_control = -0.000514644
-OD_neg_control_SD = 0.002276625
-OD_sample = 0.042475897
-"""
+my @file = glob("$dir/*");
 
-# ODc formula
-def ODc_formula(OD_neg_control, OD_neg_control_SD):
-    ODc = OD_neg_control + (3*OD_neg_control_SD)
-    return ODc
+say "@file"
 
-ODc = ODc_formula(OD_neg_control, OD_neg_control_SD)
-#print(ODc)
+# Values
 
 
-# Biofilm production conditions
-def biofilm_production_formula(OD_sample, ODc):
-    if OD_sample <= ODc:
-        return "none"
+my $id = 7376;
+my $OD_neg_control = -0.000514644;
+my $OD_neg_control_SD = 0.002276625;
+my $OD_sample = 0.042475897;
 
-    elif ODc < OD_sample and OD_sample <= 2*ODc:
-        return "low"
 
-    elif 2*ODc < OD_sample and OD_sample <= 4*ODc:
-        return "medium"
-
-    elif 4*ODc < OD_sample:
-        return "high"
-
-    else:
-        return "null"
-
-biofilm_production = biofilm_production_formula(OD_sample, ODc)
-print(biofilm_production)
+# Result
+my $ODc = ODc_formula();
+my $biofilm_production = biofilm_production();
 
 
 # Output
-print("id\tbiofilm_production\n", id, biofilm_production)
-"""
+say "id\tbiofilm_production\n$id\t$biofilm_production";
+
+
+
+                            ##SUBROUTINES##
+# ODc formula 
+sub ODc_formula {
+    my $ODc = $OD_neg_control + (3 * $OD_neg_control_SD);
+    return $ODc;
+}
+
+
+# Biofilm production conditions
+sub biofilm_production {
+    if ($OD_sample <= $ODc){
+        return "none";
+    }
+
+    if ($ODc < $OD_sample and $OD_sample <= 2*$ODc){
+        return "low";
+    }
+
+    if (2*$ODc < $OD_sample and $OD_sample <= 4*$ODc){
+        return "medium";
+    }
+
+    if (4*$ODc < $OD_sample){
+        return "high";
+    }
+
+    else {
+        return "null";
+    }
+}
