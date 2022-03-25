@@ -5,39 +5,15 @@ use 5.010;
 
 
 # Input file
-my ( $dir, $DEBUG, $filename );
-
-GetOptions(
-    'd|dir|directory=s'  => \$dir,
-    'db|debug'   => \$DEBUG
-);
-if (!defined $dir){
-	$dir = '.';
-	
-}
-
-
-my @file = glob("$dir/*");
-
-foreach my $file (@file) {
-	say $file;
-}
-
-
-# Values
-my $id = 7376;
-my $OD_neg_control = -0.000514644;
-my $OD_neg_control_SD = 0.002276625;
-my $OD_sample = 0.042475897;
-
-
-# Result
-my $ODc = ODc_formula();
-my $biofilm_production = biofilm_production();
-
-
+open (my $fh, ‘<’, $filename) || die “Cannot open $filename.”;
+while (my $line = <$fh>){
+	next if !$line; #Ignore empty lines.
+	# Result
+    my ($isolate_id, $OD_neg_control, $OD_neg_control_SD, $OD_sample) = split/\t/,$line;
+	my $biofilm_production = biofilm_production($OD_neg_control, $OD_neg_control_SD, $OD_sample);
 # Output
-say "id\tbiofilm_production\n$id\t$biofilm_production";
+say "id\tbiofilm_production\n$isolate_id\t$biofilm_production";
+}
 
 
 
@@ -51,6 +27,7 @@ sub ODc_formula {
 
 # Biofilm production conditions
 sub biofilm_production {
+    my ($OD_neg_control, $OD_neg_control_SD, $OD_sample) = @_;
     if ($OD_sample <= $ODc){
         return "none";
     }
