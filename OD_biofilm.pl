@@ -5,7 +5,18 @@ use 5.010;
 
 
 # Input file
-open (my $fh, ‘<’, $filename) || die “Cannot open $filename.”;
+my ( $dir, $DEBUG, $filename );
+GetOptions(
+    'd|dir|directory=s'  => \$dir,
+    'db|debug'   => \$DEBUG
+);
+if (!defined $dir){
+	$dir = '.';
+	
+}
+
+
+open (my $fh, "<", $filename) || die "Cannot open $filename";
 while (my $line = <$fh>){
 	next if !$line; #Ignore empty lines.
 	# Result
